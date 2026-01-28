@@ -8,11 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/
 import { Skeleton } from './ui/skeleton';
 import { Flame } from 'lucide-react';
 
-const GoalItem = ({ label, value, color }: { label: string; value: number; color?: string }) => (
+const GoalItem = ({ label, value, protein, color }: { label: string; value: number; protein: number; color?: string }) => (
     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50 text-center">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className={`text-2xl font-bold ${color || 'text-primary'}`}>{Math.round(value)}</p>
-        <p className="text-xs text-muted-foreground">calories/day</p>
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <div className="mt-2">
+            <p className={`text-3xl font-bold ${color || 'text-primary'}`}>{Math.round(value)}</p>
+            <p className="text-xs text-muted-foreground -mt-1">Calories</p>
+        </div>
+        <div className="mt-3">
+            <p className="text-xl font-bold">{Math.round(protein)}g</p>
+            <p className="text-xs text-muted-foreground -mt-1">Protein</p>
+        </div>
     </div>
 );
 
@@ -21,12 +27,14 @@ export function CalorieGoals() {
   const { profile, loading: profileLoading } = useUserProfile();
   const [goals, setGoals] = useState<CalculateCalorieGoalsOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchGoals() {
       if (profile) {
         try {
           setLoading(true);
+          setError(null);
           const result = await calculateCalorieGoalsAction({
             age: profile.age,
             gender: profile.gender,
@@ -37,7 +45,7 @@ export function CalorieGoals() {
           setGoals(result);
         } catch (error) {
           console.error("Failed to fetch calorie goals", error);
-          // Optionally set an error state to show in the UI
+          setError("Could not load your calorie goals.");
         } finally {
           setLoading(false);
         }
@@ -46,6 +54,8 @@ export function CalorieGoals() {
 
     if (!profileLoading && profile) {
       fetchGoals();
+    } else if (!profileLoading && !profile) {
+      setLoading(false);
     }
   }, [profile, profileLoading]);
 
@@ -56,27 +66,29 @@ export function CalorieGoals() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Flame className="h-6 w-6 text-primary" />
-          <CardTitle>Daily Calorie Goals</CardTitle>
+          <CardTitle>Daily Goals</CardTitle>
         </div>
         <CardDescription>
-            AI-powered recommendations based on your profile.
+            AI-powered recommendations for your daily calorie and protein intake.
         </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-36 w-full" />
+            <Skeleton className="h-36 w-full" />
+            <Skeleton className="h-36 w-full" />
           </div>
+        ) : error ? (
+            <p className="text-muted-foreground text-center">{error}</p>
         ) : goals ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <GoalItem label="Cut" value={goals.cutting} color="text-chart-4" />
-            <GoalItem label="Maintain" value={goals.maintenance} color="text-chart-2" />
-            <GoalItem label="Bulk" value={goals.bulking} color="text-chart-1" />
+            <GoalItem label="Cut" value={goals.cutting} protein={goals.protein.cutting} color="text-chart-4" />
+            <GoalItem label="Maintain" value={goals.maintenance} protein={goals.protein.maintenance} color="text-chart-2" />
+            <GoalItem label="Bulk" value={goals.bulking} protein={goals.protein.bulking} color="text-chart-1" />
           </div>
         ) : (
-          <p className="text-muted-foreground text-center">Could not load your calorie goals.</p>
+          <p className="text-muted-foreground text-center">Could not load your goals.</p>
         )}
       </CardContent>
     </Card>

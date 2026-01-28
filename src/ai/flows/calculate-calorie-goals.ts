@@ -24,6 +24,11 @@ const CalculateCalorieGoalsOutputSchema = z.object({
   maintenance: z.number().describe('The estimated daily calories to maintain current weight.'),
   cutting: z.number().describe('The estimated daily calories for weight loss (a moderate deficit).'),
   bulking: z.number().describe('The estimated daily calories for muscle gain (a moderate surplus).'),
+  protein: z.object({
+      cutting: z.number().describe('The recommended daily protein intake in grams for cutting.'),
+      maintenance: z.number().describe('The recommended daily protein intake in grams for maintenance.'),
+      bulking: z.number().describe('The recommended daily protein intake in grams for bulking.'),
+  }).describe('The recommended daily protein intake in grams for each goal.')
 });
 export type CalculateCalorieGoalsOutput = z.infer<typeof CalculateCalorieGoalsOutputSchema>;
 
@@ -38,7 +43,7 @@ const prompt = ai.definePrompt({
   name: 'calculateCalorieGoalsPrompt',
   input: {schema: CalculateCalorieGoalsInputSchema},
   output: {schema: CalculateCalorieGoalsOutputSchema},
-  prompt: `You are a nutrition and fitness expert. Your task is to calculate the recommended daily calorie intake for a user based on their personal details.
+  prompt: `You are a nutrition and fitness expert. Your task is to calculate the recommended daily calorie and protein intake for a user based on their personal details.
 
 User Details:
 - Age: {{{age}}} years
@@ -61,12 +66,14 @@ Follow these steps for your calculation:
 3.  Calculate the Total Daily Energy Expenditure (TDEE) for maintenance:
     - TDEE = BMR * Activity Multiplier
 
-4.  Calculate the goals:
+4.  Calculate the calorie goals:
     - Maintenance: Round the TDEE to the nearest whole number.
     - Cutting: Subtract 400 calories from the TDEE and round to the nearest whole number.
     - Bulking: Add 400 calories to the TDEE and round to the nearest whole number.
 
-Provide the final numbers for maintenance, cutting, and bulking as a JSON object.
+5.  Calculate the protein goals in grams. Use a target of 1.8 grams of protein per kilogram of body weight. Round to the nearest whole number. The protein intake should be the same for cutting, maintenance, and bulking. Set the \`cutting\`, \`maintenance\`, and \`bulking\` fields in the \`protein\` object to this same value.
+
+Provide the final numbers for calorie and protein goals as a JSON object.
 `,
 });
 
