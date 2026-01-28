@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
   name: 'estimateMealCaloriesPrompt',
   input: {schema: EstimateMealCaloriesInputSchema},
   output: {schema: EstimateMealCaloriesOutputSchema},
-  prompt: `You are a nutrition expert. You will be given a photo of a meal and you will estimate its calorie and macro content.
+  prompt: `You are a nutrition expert. Your task is to analyze an image of a meal and estimate its nutritional content. Tell me the calories from this image. Keep in mind the relative size and ingredients.
 
   Photo: {{media url=photoDataUri}}
 
