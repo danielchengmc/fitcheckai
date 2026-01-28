@@ -1,7 +1,9 @@
 'use server';
 
-import { estimateMealCalories as estimateMealCaloriesFlow, EstimateMealCaloriesInput, EstimateMealCaloriesOutput } from "@/ai/flows/estimate-meal-calories";
-import { calculateCalorieGoals as calculateCalorieGoalsFlow, CalculateCalorieGoalsInput, CalculateCalorieGoalsOutput } from "@/ai/flows/calculate-calorie-goals";
+import { estimateMealCalories as estimateMealCaloriesFlow } from "@/ai/flows/estimate-meal-calories";
+import type { EstimateMealCaloriesInput, EstimateMealCaloriesOutput } from "@/ai/flows/estimate-meal-calories";
+import { calculateCalorieGoals as calculateCalorieGoalsFlow } from "@/ai/flows/calculate-calorie-goals";
+import type { CalculateCalorieGoalsInput, CalculateCalorieGoalsOutput } from "@/ai/flows/calculate-calorie-goals";
 
 export async function estimateMealCaloriesAction(input: EstimateMealCaloriesInput): Promise<EstimateMealCaloriesOutput> {
   try {
