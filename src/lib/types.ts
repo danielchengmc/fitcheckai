@@ -34,3 +34,30 @@ export type UserProfile = {
   email?: string | null;
   displayName?: string | null;
 };
+
+export type EstimateMealCaloriesInput = {
+  photoDataUri: string;
+};
+
+export type EstimateMealCaloriesOutput = {
+  calories: number;
+};
+
+export type CalculateCalorieGoalsInput = {
+  age: number;
+  gender: string;
+  height: number;
+  weight: number;
+  exerciseFrequency: number;
+};
+
+export type CalculateCalorieGoalsOutput = {
+  maintenance: number;
+  cutting: number;
+  bulking: number;
+  protein: {
+    cutting: number;
+    maintenance: number;
+    bulking: number;
+  };
+};

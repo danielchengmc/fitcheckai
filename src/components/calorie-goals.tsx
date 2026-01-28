@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateCalorieGoalsAction } from '@/app/dashboard/actions';
-import type { CalculateCalorieGoalsOutput } from '@/ai/flows/calculate-calorie-goals';
+import type { CalculateCalorieGoalsOutput } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Skeleton } from './ui/skeleton';
 import { Flame } from 'lucide-react';

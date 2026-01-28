@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import type { EstimateMealCaloriesInput, EstimateMealCaloriesOutput } from '@/lib/types';
 
 const EstimateMealCaloriesInputSchema = z.object({
   photoDataUri: z
@@ -18,12 +19,10 @@ const EstimateMealCaloriesInputSchema = z.object({
       'A photo of a meal, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' 
     ),
 });
-type EstimateMealCaloriesInput = z.infer<typeof EstimateMealCaloriesInputSchema>;
 
 const EstimateMealCaloriesOutputSchema = z.object({
   calories: z.number().describe('The estimated calorie count of the meal.'),
 });
-type EstimateMealCaloriesOutput = z.infer<typeof EstimateMealCaloriesOutputSchema>;
 
 export async function estimateMealCalories(
   input: EstimateMealCaloriesInput
