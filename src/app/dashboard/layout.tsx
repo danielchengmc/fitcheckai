@@ -6,6 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/icons';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { OnboardingForm } from '@/components/onboarding-form';
+import { usePathname } from 'next/navigation';
+import { DashboardNav } from '@/components/dashboard-nav';
 
 export default function DashboardLayout({
   children,
@@ -14,6 +16,7 @@ export default function DashboardLayout({
 }) {
   const { user, loading: userLoading } = useUser();
   const { profile, loading: profileLoading } = useUserProfile();
+  const pathname = usePathname();
 
   const isLoading = userLoading || profileLoading;
 
@@ -50,10 +53,15 @@ export default function DashboardLayout({
     );
   }
 
+  const isProfilePage = pathname === '/dashboard/profile';
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 p-4 sm:p-6 md:p-8">
+        {!isProfilePage && <DashboardNav />}
+        {children}
+      </main>
     </div>
   );
 }
