@@ -18,7 +18,7 @@ const CalculateCalorieGoalsInputSchema = z.object({
   weight: z.number().describe('The weight of the user in kilograms.'),
   exerciseFrequency: z.number().describe('How many days per week the user exercises (0-7).'),
 });
-export type CalculateCalorieGoalsInput = z.infer<typeof CalculateCalorieGoalsInputSchema>;
+type CalculateCalorieGoalsInput = z.infer<typeof CalculateCalorieGoalsInputSchema>;
 
 const CalculateCalorieGoalsOutputSchema = z.object({
   maintenance: z.number().describe('The estimated daily calories to maintain current weight.'),
@@ -30,7 +30,7 @@ const CalculateCalorieGoalsOutputSchema = z.object({
       bulking: z.number().describe('The recommended daily protein intake in grams for bulking.'),
   }).describe('The recommended daily protein intake in grams for each goal.')
 });
-export type CalculateCalorieGoalsOutput = z.infer<typeof CalculateCalorieGoalsOutputSchema>;
+type CalculateCalorieGoalsOutput = z.infer<typeof CalculateCalorieGoalsOutputSchema>;
 
 
 export async function calculateCalorieGoals(
