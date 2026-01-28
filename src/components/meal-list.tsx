@@ -96,7 +96,7 @@ export function MealList() {
           </CardContent>
            <CardFooter className="p-4 pt-0">
                 <p className="text-xs text-muted-foreground">
-                    Logged {formatDistanceToNow(new Date(meal.createdAt), { addSuffix: true })}
+                    Logged {meal.createdAt ? formatDistanceToNow(new Date(meal.createdAt), { addSuffix: true }) : 'just now'}
                 </p>
           </CardFooter>
         </Card>

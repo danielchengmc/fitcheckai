@@ -71,25 +71,25 @@ export function WorkoutList() {
               <div className="flex justify-between w-full pr-4">
                 <span className="font-semibold text-primary">{workout.name}</span>
                 <span className="text-sm text-muted-foreground">
-                  {format(new Date(workout.createdAt), 'MMM d, yyyy')}
+                  {workout.createdAt ? format(new Date(workout.createdAt), 'MMM d, yyyy') : 'Date not available'}
                 </span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-4">
               <div className="space-y-2">
-                <div className="grid grid-cols-4 gap-4 font-semibold text-sm text-muted-foreground px-2">
+                <div className="grid grid-cols-5 gap-4 font-semibold text-sm text-muted-foreground px-2">
                   <div className="col-span-2">Exercise</div>
-                  <div>Sets</div>
-                  <div>Reps</div>
-                  {/* <div>Weight</div> */}
+                  <div className="text-center">Sets</div>
+                  <div className="text-center">Reps</div>
+                  <div className="text-center">Weight</div>
                 </div>
                 <div className="divide-y rounded-md border">
                   {workout.exercises.map((exercise, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-4 p-2 text-sm items-center">
+                    <div key={index} className="grid grid-cols-5 gap-4 p-2 text-sm items-center">
                       <div className="col-span-2 font-medium">{exercise.name}</div>
                       <div className="text-center">{exercise.sets}</div>
                       <div className="text-center">{exercise.reps}</div>
-                      {/* <div className="text-center">{exercise.weight} kg</div> */}
+                      <div className="text-center">{exercise.weight} kg</div>
                     </div>
                   ))}
                 </div>

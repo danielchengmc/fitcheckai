@@ -11,7 +11,7 @@ export type Workout = {
   id?: string;
   name:string;
   exercises: Exercise[];
-  createdAt: Timestamp | Date;
+  createdAt?: Timestamp | Date;
 };
 
 export type Meal = {
@@ -21,7 +21,7 @@ export type Meal = {
   protein: number;
   carbohydrates: number;
   fat: number;
-  createdAt: Timestamp | Date;
+  createdAt?: Timestamp | Date;
 };
 
 export type UserProfile = {
