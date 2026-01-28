@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "meal-1",
+      "description": "A healthy salad bowl.",
+      "imageUrl": "https://images.unsplash.com/photo-1646487793655-bbf280273d2f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzYWxhZCUyMGJvd2x8ZW58MHx8fHwxNzY5NDkwMzQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "salad bowl"
+    },
+    {
+      "id": "meal-2",
+      "description": "Grilled chicken and vegetables.",
+      "imageUrl": "https://images.unsplash.com/photo-1592011432621-f7f576f44484?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxncmlsbGVkJTIwY2hpY2tlbnxlbnwwfHx8fDE3Njk0OTYzMjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grilled chicken"
+    },
+    {
+      "id": "meal-3",
+      "description": "A stack of pancakes with berries.",
+      "imageUrl": "https://images.unsplash.com/photo-1666052137730-e2c5c87f5671?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwYW5jYWtlcyUyMGJlcnJpZXN8ZW58MHx8fHwxNzY5NTM2OTA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pancakes berries"
+    }
+  ]
 }
