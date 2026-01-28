@@ -83,7 +83,7 @@ export default function WelcomePage() {
         title: 'Profile Saved!',
         description: "Welcome to FitTrackAI! We're excited to have you.",
       });
-      router.push('/dashboard');
+      // We don't redirect here anymore. The useEffect will handle it when the profile updates.
     } catch (error) {
       console.error(error);
       toast({
