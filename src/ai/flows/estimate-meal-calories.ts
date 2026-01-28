@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Estimates the calorie and macro content of a meal from a photo.
+ * @fileOverview Estimates the calorie content of a meal from a photo.
  *
  * - estimateMealCalories - A function that handles the meal calorie estimation process.
  * - EstimateMealCaloriesInput - The input type for the estimateMealCalories function.
@@ -22,11 +22,6 @@ export type EstimateMealCaloriesInput = z.infer<typeof EstimateMealCaloriesInput
 
 const EstimateMealCaloriesOutputSchema = z.object({
   calories: z.number().describe('The estimated calorie count of the meal.'),
-  protein: z.number().describe('The estimated protein content of the meal in grams.'),
-  carbohydrates: z
-    .number()
-    .describe('The estimated carbohydrate content of the meal in grams.'),
-  fat: z.number().describe('The estimated fat content of the meal in grams.'),
 });
 export type EstimateMealCaloriesOutput = z.infer<typeof EstimateMealCaloriesOutputSchema>;
 
@@ -40,12 +35,9 @@ const prompt = ai.definePrompt({
   name: 'estimateMealCaloriesPrompt',
   input: {schema: EstimateMealCaloriesInputSchema},
   output: {schema: EstimateMealCaloriesOutputSchema},
-  prompt: `You are a nutrition expert. Your task is to analyze an image of a meal and estimate its nutritional content. Tell me the calories from this image. Keep in mind the relative size and ingredients.
+  prompt: `Output only one number. Tell me the calories of everything in this picture combined.
 
-  Photo: {{media url=photoDataUri}}
-
-  Respond with the estimated calorie count, protein content (in grams), carbohydrate content (in grams), and fat content (in grams). Return the response as a JSON object. Be as accurate as possible.
-  `,
+  Photo: {{media url=photoDataUri}}`,
 });
 
 const estimateMealCaloriesFlow = ai.defineFlow(

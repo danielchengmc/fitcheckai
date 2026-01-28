@@ -18,9 +18,6 @@ export type Meal = {
   id?: string;
   imageUrl: string;
   calories: number;
-  protein: number;
-  carbohydrates: number;
-  fat: number;
   createdAt?: Timestamp | Date;
 };
 

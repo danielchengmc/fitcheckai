@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/use-user';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { Meal } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { Skeleton } from './ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
@@ -75,23 +75,9 @@ export function MealList() {
             </div>
           </CardHeader>
           <CardContent className="p-4">
-             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <div>
-                    <p className="font-semibold text-primary">{Math.round(meal.calories)}</p>
-                    <p className="text-muted-foreground">Calories</p>
-                </div>
-                <div>
-                    <p className="font-semibold">{Math.round(meal.protein)}g</p>
-                    <p className="text-muted-foreground">Protein</p>
-                </div>
-                <div>
-                    <p className="font-semibold">{Math.round(meal.carbohydrates)}g</p>
-                    <p className="text-muted-foreground">Carbs</p>
-                </div>
-                <div>
-                    <p className="font-semibold">{Math.round(meal.fat)}g</p>
-                    <p className="text-muted-foreground">Fat</p>
-                </div>
+             <div className="space-y-1">
+                <p className="font-semibold text-2xl text-primary">{Math.round(meal.calories)}</p>
+                <p className="text-sm text-muted-foreground">Calories</p>
              </div>
           </CardContent>
            <CardFooter className="p-4 pt-0">
