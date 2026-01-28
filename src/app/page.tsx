@@ -2,22 +2,15 @@
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';
 import { useEffect } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/icons';
 
 export default function Home() {
-  const { user, loading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        router.replace('/dashboard');
-      } else {
-        router.replace('/login');
-      }
-    }
-  }, [user, loading, router]);
+    // Redirect all users to the dashboard, which will handle auth checks.
+    router.replace('/dashboard');
+  }, [router]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
