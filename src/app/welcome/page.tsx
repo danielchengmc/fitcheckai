@@ -50,12 +50,12 @@ export default function WelcomePage() {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      age: undefined,
+      age: '' as any,
       gender: '',
-      height: undefined,
-      weight: undefined,
+      height: '' as any,
+      weight: '' as any,
       goals: '',
-      exerciseFrequency: undefined,
+      exerciseFrequency: '' as any,
     },
   });
 
