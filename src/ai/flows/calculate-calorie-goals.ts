@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const CalculateCalorieGoalsInputSchema = z.object({
+const CalculateCalorieGoalsInputSchema = z.object({
   age: z.number().describe('The age of the user in years.'),
   gender: z.string().describe("The gender of the user ('male' or 'female')."),
   height: z.number().describe('The height of the user in centimeters.'),
@@ -20,7 +20,7 @@ export const CalculateCalorieGoalsInputSchema = z.object({
 });
 export type CalculateCalorieGoalsInput = z.infer<typeof CalculateCalorieGoalsInputSchema>;
 
-export const CalculateCalorieGoalsOutputSchema = z.object({
+const CalculateCalorieGoalsOutputSchema = z.object({
   maintenance: z.number().describe('The estimated daily calories to maintain current weight.'),
   cutting: z.number().describe('The estimated daily calories for weight loss (a moderate deficit).'),
   bulking: z.number().describe('The estimated daily calories for muscle gain (a moderate surplus).'),
