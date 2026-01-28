@@ -6,22 +6,33 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/icons';
+import { useUserProfile } from '@/hooks/use-user-profile';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useUser();
+  const { user, loading: userLoading } = useUser();
+  const { profile, loading: profileLoading } = useUserProfile();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!userLoading && !user) {
       router.replace('/login');
     }
-  }, [user, loading, router]);
+  }, [user, userLoading, router]);
 
-  if (loading || !user) {
+  useEffect(() => {
+    if (!profileLoading && user && !profile?.profileComplete) {
+      router.replace('/welcome');
+    }
+  }, [profile, profileLoading, user, router]);
+
+  const isLoading = userLoading || profileLoading;
+  const isRedirecting = !profileLoading && user && !profile?.profileComplete;
+
+  if (isLoading || !user || isRedirecting) {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <header className="flex h-16 items-center border-b bg-background px-4 md:px-6 justify-between">
