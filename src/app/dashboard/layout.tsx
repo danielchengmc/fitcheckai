@@ -2,11 +2,10 @@
 
 import { Header } from '@/components/header';
 import { useUser } from '@/hooks/use-user';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/icons';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { OnboardingForm } from '@/components/onboarding-form';
 
 export default function DashboardLayout({
   children,
@@ -15,24 +14,10 @@ export default function DashboardLayout({
 }) {
   const { user, loading: userLoading } = useUser();
   const { profile, loading: profileLoading } = useUserProfile();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!userLoading && !user) {
-      router.replace('/login');
-    }
-  }, [user, userLoading, router]);
-
-  useEffect(() => {
-    if (!profileLoading && user && !profile?.profileComplete) {
-      router.replace('/welcome');
-    }
-  }, [profile, profileLoading, user, router]);
 
   const isLoading = userLoading || profileLoading;
-  const isRedirecting = !profileLoading && user && !profile?.profileComplete;
 
-  if (isLoading || !user || isRedirecting) {
+  if (isLoading || !user) {
     return (
         <div className="flex min-h-screen w-full flex-col">
             <header className="flex h-16 items-center border-b bg-background px-4 md:px-6 justify-between">
@@ -48,6 +33,20 @@ export default function DashboardLayout({
                 </div>
             </main>
         </div>
+    );
+  }
+
+  if (!profile?.profileComplete) {
+    return (
+      <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background p-4">
+        <div className="mb-8 flex items-center gap-2 text-2xl font-bold text-primary">
+          <Icons.logo className="h-8 w-8" />
+          <h1 className="font-headline">FitTrackAI</h1>
+        </div>
+        <div className="w-full max-w-md">
+          <OnboardingForm />
+        </div>
+      </main>
     );
   }
 
