@@ -6,11 +6,20 @@ import { Icons } from '@/components/icons';
 
 export default function Home() {
   const router = useRouter();
+  const { user, loading } = useUser();
 
   useEffect(() => {
-    // Redirect all users to the dashboard, which will handle auth checks.
-    router.replace('/dashboard');
-  }, [router]);
+    if (!loading) {
+      if (user) {
+        // If user is logged in, redirect to dashboard.
+        router.replace('/dashboard');
+      } else {
+        // If user is not logged in, redirect to login page.
+        router.replace('/login');
+      }
+    }
+    // This effect should run when loading or user state changes.
+  }, [user, loading, router]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
