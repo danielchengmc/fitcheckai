@@ -1,4 +1,4 @@
-import { Weight, Dumbbell, UtensilsCrossed, LayoutDashboard, LoaderCircle } from 'lucide-react';
+import { Weight, Dumbbell, UtensilsCrossed, LayoutDashboard, LoaderCircle, User, LogOut } from 'lucide-react';
 import React from 'react';
 
 const GoogleIcon = (props: React.ComponentProps<'svg'>) => (
@@ -15,4 +15,6 @@ export const Icons = {
   dashboard: LayoutDashboard,
   spinner: LoaderCircle,
   google: GoogleIcon,
+  user: User,
+  logout: LogOut,
 };
