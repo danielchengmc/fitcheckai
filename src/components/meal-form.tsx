@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { useUser } from '@/hooks/use-user';
 import { useToast } from '@/hooks/use-toast';
-import { estimateMealCaloriesAction } from '@/app/dashboard/actions';
+import { estimateMealCalories } from '@/ai/flows/estimate-meal-calories';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -66,7 +66,7 @@ export function MealForm({ onMealAdded }: MealFormProps) {
 
     try {
       // 1. Get AI estimation
-      const nutritionData = await estimateMealCaloriesAction({ photoDataUri: preview });
+      const nutritionData = await estimateMealCalories({ photoDataUri: preview });
 
       // 2. Upload image to Firebase Storage
       const storageRef = ref(storage, `meals/${user.uid}/${Date.now()}_${imageFile.name}`);

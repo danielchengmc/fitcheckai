@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { calculateCalorieGoalsAction } from '@/app/dashboard/actions';
+import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
 import type { CalculateCalorieGoalsOutput } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Skeleton } from './ui/skeleton';
@@ -35,7 +35,7 @@ export function CalorieGoals() {
         try {
           setLoading(true);
           setError(null);
-          const result = await calculateCalorieGoalsAction({
+          const result = await calculateCalorieGoals({
             age: profile.age,
             gender: profile.gender,
             height: profile.height,
