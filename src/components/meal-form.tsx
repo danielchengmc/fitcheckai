@@ -137,7 +137,7 @@ function ManualMealForm({ onMealAdded }: MealFormProps) {
     const form = useForm<z.infer<typeof manualFormSchema>>({
       resolver: zodResolver(manualFormSchema),
       defaultValues: {
-        calories: undefined,
+        calories: '' as any,
       },
     });
   
