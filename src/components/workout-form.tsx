@@ -1,3 +1,4 @@
+
 'use client';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,27 +52,25 @@ export function WorkoutForm({ onWorkoutAdded }: WorkoutFormProps) {
     if (!user) return;
     setIsLoading(true);
 
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'workouts'), {
-        ...values,
-        createdAt: new Date(),
-      });
-
-      toast({
-        title: 'Workout Logged!',
-        description: 'Your workout has been successfully saved.',
-      });
-      onWorkoutAdded();
-      form.reset();
-    } catch (error) {
+    addDoc(collection(db, 'users', user.uid, 'workouts'), {
+      ...values,
+      createdAt: new Date(),
+    }).catch((error) => {
+      console.error("Error logging workout:", error);
       toast({
         title: 'Error Logging Workout',
         description: 'There was a problem saving your workout.',
         variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
-    }
+    });
+
+    toast({
+      title: 'Workout Logged!',
+      description: 'Your workout has been successfully saved.',
+    });
+    onWorkoutAdded();
+    form.reset();
+    setIsLoading(false);
   }
 
   return (

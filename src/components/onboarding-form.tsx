@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -77,18 +78,26 @@ export function OnboardingForm() {
         createdAt: new Date(),
         calorieGoals,
       };
-      await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
+      
+      setDoc(doc(db, 'users', user.uid), userProfile, { merge: true }).catch((error) => {
+          console.error("Error saving profile:", error);
+          toast({
+            title: 'Error Saving Profile',
+            description: 'Your details could not be saved. Please try again.',
+            variant: 'destructive',
+          });
+      });
 
       toast({
         title: 'Profile Saved!',
         description: "Welcome to FitTrackAI! We're excited to have you.",
       });
-      // No redirect needed. The parent layout will automatically switch views.
+      // The parent layout will automatically switch views on successful save.
     } catch (error) {
       console.error(error);
       toast({
         title: 'Error Saving Profile',
-        description: 'There was a problem saving your details. Please try again.',
+        description: 'There was a problem personalizing your details. Please try again.',
         variant: 'destructive',
       });
     } finally {
