@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
 import type { CalorieGoals as CalorieGoalsType } from '@/lib/types';
@@ -32,6 +32,7 @@ export function CalorieGoals() {
   const [goals, setGoals] = useState<CalorieGoalsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     async function fetchAndSetGoals() {
@@ -39,7 +40,11 @@ export function CalorieGoals() {
         if (profile.calorieGoals) {
           setGoals(profile.calorieGoals);
           setLoading(false);
+          hasFetched.current = true;
         } else {
+          if (hasFetched.current) return;
+          hasFetched.current = true;
+
           try {
             setLoading(true);
             setError(null);
@@ -59,7 +64,7 @@ export function CalorieGoals() {
 
           } catch (error) {
             console.error("Failed to fetch calorie goals", error);
-            setError("Could not load your calorie goals.");
+            setError("Could not load your calorie goals. You may be temporarily rate limited.");
           } finally {
             setLoading(false);
           }
