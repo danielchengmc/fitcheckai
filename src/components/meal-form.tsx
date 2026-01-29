@@ -22,23 +22,28 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Icons } from './icons';
 import { Card, CardContent } from './ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const formSchema = z.object({
+const aiFormSchema = z.object({
   image: z.custom<FileList>().refine((files) => files?.length > 0, 'An image is required.'),
+});
+
+const manualFormSchema = z.object({
+    calories: z.coerce.number().min(1, "Please enter a valid calorie amount."),
 });
 
 type MealFormProps = {
   onMealAdded: () => void;
 };
 
-export function MealForm({ onMealAdded }: MealFormProps) {
+function AiMealForm({ onMealAdded }: MealFormProps) {
   const { user } = useUser();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof aiFormSchema>>({
+    resolver: zodResolver(aiFormSchema),
   });
   
   const imageRef = form.register("image");
@@ -57,23 +62,21 @@ export function MealForm({ onMealAdded }: MealFormProps) {
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof aiFormSchema>) {
     if (!user || !preview) return;
     setIsLoading(true);
 
     try {
-      // 1. Get AI estimation
-      const nutritionData = await estimateMealCalories({ photoDataUri: preview });
+      const { calories } = await estimateMealCalories({ photoDataUri: preview });
 
-      // 2. Save to Firestore (without image upload)
       await addDoc(collection(db, 'users', user.uid, 'meals'), {
-        ...nutritionData,
+        calories,
         createdAt: serverTimestamp(),
       });
 
       toast({
         title: 'Meal Logged!',
-        description: 'Your meal and its nutritional info have been saved.',
+        description: `AI estimated ${Math.round(calories)} calories.`,
       });
       onMealAdded();
       form.reset();
@@ -82,7 +85,7 @@ export function MealForm({ onMealAdded }: MealFormProps) {
       console.error(error);
       toast({
         title: 'Error Logging Meal',
-        description: 'There was a problem analyzing or saving your meal.',
+        description: 'There was a problem analyzing your meal. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -92,7 +95,7 @@ export function MealForm({ onMealAdded }: MealFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
         <FormField
           control={form.control}
           name="image"
@@ -123,5 +126,87 @@ export function MealForm({ onMealAdded }: MealFormProps) {
         </Button>
       </form>
     </Form>
+  );
+}
+
+function ManualMealForm({ onMealAdded }: MealFormProps) {
+    const { user } = useUser();
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
+  
+    const form = useForm<z.infer<typeof manualFormSchema>>({
+      resolver: zodResolver(manualFormSchema),
+      defaultValues: {
+        calories: undefined,
+      },
+    });
+  
+    async function onSubmit(values: z.infer<typeof manualFormSchema>) {
+      if (!user) return;
+      setIsLoading(true);
+  
+      try {
+        await addDoc(collection(db, 'users', user.uid, 'meals'), {
+          calories: values.calories,
+          createdAt: serverTimestamp(),
+        });
+  
+        toast({
+          title: 'Meal Logged!',
+          description: `You manually logged ${values.calories} calories.`,
+        });
+        onMealAdded();
+        form.reset();
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: 'Error Logging Meal',
+          description: 'There was a problem saving your meal.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+          <FormField
+            control={form.control}
+            name="calories"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Calories</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="e.g., 500" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+            Log Meal
+          </Button>
+        </form>
+      </Form>
+    );
+  }
+
+export function MealForm({ onMealAdded }: MealFormProps) {
+  return (
+    <Tabs defaultValue="ai" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="ai">AI Estimate</TabsTrigger>
+        <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+      </TabsList>
+      <TabsContent value="ai">
+        <AiMealForm onMealAdded={onMealAdded} />
+      </TabsContent>
+      <TabsContent value="manual">
+        <ManualMealForm onMealAdded={onMealAdded} />
+      </TabsContent>
+    </Tabs>
   );
 }
