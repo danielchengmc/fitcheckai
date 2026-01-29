@@ -69,9 +69,16 @@ function AiMealForm({ onMealAdded }: MealFormProps) {
     try {
       const { calories } = await estimateMealCalories({ photoDataUri: preview });
 
-      await addDoc(collection(db, 'users', user.uid, 'meals'), {
+      addDoc(collection(db, 'users', user.uid, 'meals'), {
         calories,
         createdAt: serverTimestamp(),
+      }).catch((error) => {
+        console.error("Error logging meal:", error);
+        toast({
+          title: 'Error Logging Meal',
+          description: 'There was a problem saving your meal to the database.',
+          variant: 'destructive',
+        });
       });
 
       toast({
@@ -141,32 +148,29 @@ function ManualMealForm({ onMealAdded }: MealFormProps) {
       },
     });
   
-    async function onSubmit(values: z.infer<typeof manualFormSchema>) {
+    function onSubmit(values: z.infer<typeof manualFormSchema>) {
       if (!user) return;
       setIsLoading(true);
   
-      try {
-        await addDoc(collection(db, 'users', user.uid, 'meals'), {
-          calories: values.calories,
-          createdAt: serverTimestamp(),
-        });
-  
-        toast({
-          title: 'Meal Logged!',
-          description: `You manually logged ${values.calories} calories.`,
-        });
-        onMealAdded();
-        form.reset();
-      } catch (error) {
-        console.error(error);
+      addDoc(collection(db, 'users', user.uid, 'meals'), {
+        calories: values.calories,
+        createdAt: serverTimestamp(),
+      }).catch((error) => {
+        console.error("Error logging meal:", error);
         toast({
           title: 'Error Logging Meal',
           description: 'There was a problem saving your meal.',
           variant: 'destructive',
         });
-      } finally {
-        setIsLoading(false);
-      }
+      });
+
+      toast({
+        title: 'Meal Logged!',
+        description: `You manually logged ${values.calories} calories.`,
+      });
+      onMealAdded();
+      form.reset();
+      setIsLoading(false);
     }
   
     return (
