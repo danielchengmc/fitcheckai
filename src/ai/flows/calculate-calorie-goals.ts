@@ -8,8 +8,7 @@
  * - CalculateCalorieGoalsOutput - The return type for the calculateCalorieGoals function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'zod';
 import type { CalculateCalorieGoalsInput, CalculateCalorieGoalsOutput } from '@/lib/types';
 
 const CalculateCalorieGoalsInputSchema = z.object({
@@ -17,74 +16,68 @@ const CalculateCalorieGoalsInputSchema = z.object({
   gender: z.string().describe("The gender of the user ('male' or 'female')."),
   height: z.number().describe('The height of the user in centimeters.'),
   weight: z.number().describe('The weight of the user in kilograms.'),
-  exerciseFrequency: z.number().describe('How many days per week the user exercises (0-7).'),
-});
-
-const CalculateCalorieGoalsOutputSchema = z.object({
-  maintenance: z.number().describe('The estimated daily calories to maintain current weight.'),
-  cutting: z.number().describe('The estimated daily calories for weight loss (a moderate deficit).'),
-  bulking: z.number().describe('The estimated daily calories for muscle gain (a moderate surplus).'),
-  protein: z.object({
-      cutting: z.number().describe('The recommended daily protein intake in grams for cutting.'),
-      maintenance: z.number().describe('The recommended daily protein intake in grams for maintenance.'),
-      bulking: z.number().describe('The recommended daily protein intake in grams for bulking.'),
-  }).describe('The recommended daily protein intake in grams for each goal.')
+  exerciseFrequency: z
+    .number()
+    .min(0)
+    .max(7)
+    .describe('How many days per week the user exercises (0-7).'),
 });
 
 
 export async function calculateCalorieGoals(
   input: CalculateCalorieGoalsInput
 ): Promise<CalculateCalorieGoalsOutput> {
-  return calculateCalorieGoalsFlow(input);
-}
+  const { age, gender, height, weight, exerciseFrequency } =
+    CalculateCalorieGoalsInputSchema.parse(input);
 
-const prompt = ai.definePrompt({
-  name: 'calculateCalorieGoalsPrompt',
-  input: {schema: CalculateCalorieGoalsInputSchema},
-  output: {schema: CalculateCalorieGoalsOutputSchema},
-  prompt: `You are a nutrition and fitness expert. Your task is to calculate the recommended daily calorie and protein intake for a user based on their personal details.
-
-User Details:
-- Age: {{{age}}} years
-- Gender: {{{gender}}}
-- Height: {{{height}}} cm
-- Weight: {{{weight}}} kg
-- Exercise Frequency: {{{exerciseFrequency}}} days per week
-
-Follow these steps for your calculation:
-1.  Calculate the Basal Metabolic Rate (BMR) using the Mifflin-St Jeor equation:
-    - For men: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) + 5
-    - For women: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) - 161
-
-2.  Determine the activity multiplier based on the exercise frequency:
-    - 0 days: 1.2 (Sedentary)
-    - 1-3 days: 1.375 (Lightly active)
-    - 4-5 days: 1.55 (Moderately active)
-    - 6-7 days: 1.725 (Very active)
-
-3.  Calculate the Total Daily Energy Expenditure (TDEE) for maintenance:
-    - TDEE = BMR * Activity Multiplier
-
-4.  Calculate the calorie goals:
-    - Maintenance: Round the TDEE to the nearest whole number.
-    - Cutting: Subtract 400 calories from the TDEE and round to the nearest whole number.
-    - Bulking: Add 400 calories to the TDEE and round to the nearest whole number.
-
-5.  Calculate the protein goals in grams. Use a target of 1.8 grams of protein per kilogram of body weight. Round to the nearest whole number. The protein intake should be the same for cutting, maintenance, and bulking. Set the \`cutting\`, \`maintenance\`, and \`bulking\` fields in the \`protein\` object to this same value.
-
-Provide the final numbers for calorie and protein goals as a JSON object.
-`,
-});
-
-
-const calculateCalorieGoalsFlow = ai.defineFlow(
-  {
-    name: 'calculateCalorieGoalsFlow',
-    inputSchema: CalculateCalorieGoalsInputSchema,
-    outputSchema: CalculateCalorieGoalsOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  // 1.  Calculate the Basal Metabolic Rate (BMR)
+  let bmr: number;
+  // For Men: BMR = (10 x weight in kg) + (6.25 x height in cm) - (5 x age in years) + 5
+  // For Women: BMR = (10 x weight in kg) + (6.25 x height in cm) - (5 x age in years) - 161
+  if (gender.toLowerCase() === 'male') {
+    bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+  } else {
+    bmr = 10 * weight + 6.25 * height - 5 * age - 161;
   }
-);
+
+  // 2.  Determine the activity multiplier.
+  // Sedentary (little to no exercise): BMR x 1.2
+  // Lightly Active (light exercise 1-3 days/week): BMR x 1.375
+  // Moderately Active (moderate exercise 4-5 days/week): BMR x 1.55
+  // Very Active (hard exercise 6-7 days/week): BMR x 1.725
+  let activityMultiplier: number;
+  if (exerciseFrequency === 0) {
+    activityMultiplier = 1.2;
+  } else if (exerciseFrequency >= 1 && exerciseFrequency <= 3) {
+    activityMultiplier = 1.375;
+  } else if (exerciseFrequency >= 4 && exerciseFrequency <= 5) {
+    activityMultiplier = 1.55;
+  } else { // 6-7 days
+    activityMultiplier = 1.725;
+  }
+
+  // 3.  Calculate the Total Daily Energy Expenditure (TDEE) for maintenance
+  const tdee = bmr * activityMultiplier;
+
+  // 4.  Calculate the calorie goals
+  const maintenance = Math.round(tdee);
+  const cutting = Math.round(tdee - 400);
+  const bulking = Math.round(tdee + 400);
+
+  // 5.  Calculate the protein goals in grams
+  // Protein goals is 0.8 x weight in kg x 2.2. (round to whole number)
+  const proteinGoal = Math.round(0.8 * weight * 2.2);
+
+  const result: CalculateCalorieGoalsOutput = {
+    maintenance,
+    cutting,
+    bulking,
+    protein: {
+      cutting: proteinGoal,
+      maintenance: proteinGoal,
+      bulking: proteinGoal,
+    },
+  };
+
+  return Promise.resolve(result);
+}
