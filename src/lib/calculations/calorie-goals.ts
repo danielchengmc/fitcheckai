@@ -31,16 +31,25 @@ export async function calculateCalorieGoals(
   } else {
     bmr = 10 * weight + 6.25 * height - 5 * age - 161;
   }
-  
-  // NOTE: The activity multiplier is no longer used for calorie goals based on the user's latest request.
-  // The exerciseFrequency is parsed but not used in the calculations below.
 
-  // 2.  Calculate the calorie goals based on BMR
-  const maintenance = Math.round(bmr);
-  const cutting = Math.round(bmr - 400);
-  const bulking = Math.round(bmr + 400);
+  // 2. Determine activity multiplier
+  let activityMultiplier: number;
+  if (exerciseFrequency === 0) {
+    activityMultiplier = 1.2; // Sedentary
+  } else if (exerciseFrequency >= 1 && exerciseFrequency <= 3) {
+    activityMultiplier = 1.375; // Lightly Active
+  } else if (exerciseFrequency >= 4 && exerciseFrequency <= 5) {
+    activityMultiplier = 1.55; // Moderately Active
+  } else { // 6-7
+    activityMultiplier = 1.725; // Very Active
+  }
 
-  // 3.  Calculate the protein goals in grams
+  // 3.  Calculate the calorie goals based on BMR and activity level
+  const maintenance = Math.round(bmr * activityMultiplier);
+  const cutting = Math.round(maintenance - 400);
+  const bulking = Math.round(maintenance + 400);
+
+  // 4.  Calculate the protein goals in grams
   // Protein goals is 0.8 x weight in kg x 2.2. (round to whole number)
   const proteinGoal = Math.round(0.8 * weight * 2.2);
 
