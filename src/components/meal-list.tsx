@@ -5,19 +5,27 @@ import { useUser } from '@/hooks/use-user';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { Meal } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
-import Image from 'next/image';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Card } from '@/components/ui/card';
 import { Skeleton } from './ui/skeleton';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { Icons } from './icons';
 
 export function MealList() {
   const { user } = useUser();
-  const [meals, setMeals] = useState<Meal[]>([]);
+  const [groupedMeals, setGroupedMeals] = useState<Record<string, { meals: Meal[]; totalCalories: number }>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+        setIsLoading(false);
+        return;
+    };
 
     setIsLoading(true);
     const q = query(collection(db, 'users', user.uid, 'meals'), orderBy('createdAt', 'desc'));
@@ -32,8 +40,23 @@ export function MealList() {
           createdAt: data.createdAt?.toDate(),
         } as Meal);
       });
-      setMeals(mealsData);
+
+      const grouped = mealsData.reduce((acc, meal) => {
+        if (!meal.createdAt) return acc;
+        const dateKey = format(new Date(meal.createdAt), 'yyyy-MM-dd');
+        if (!acc[dateKey]) {
+            acc[dateKey] = { meals: [], totalCalories: 0 };
+        }
+        acc[dateKey].meals.push(meal);
+        acc[dateKey].totalCalories += meal.calories;
+        return acc;
+      }, {} as Record<string, { meals: Meal[]; totalCalories: number }>);
+
+      setGroupedMeals(grouped);
       setIsLoading(false);
+    }, (error) => {
+        console.error("Error fetching meals:", error);
+        setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -41,23 +64,15 @@ export function MealList() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-[200px] w-full" />
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </CardContent>
-          </Card>
+          <Skeleton key={i} className="h-14 w-full" />
         ))}
       </div>
     );
   }
 
-  if (meals.length === 0) {
+  if (Object.keys(groupedMeals).length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p>You haven&apos;t logged any meals yet.</p>
@@ -67,31 +82,36 @@ export function MealList() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {meals.map((meal) => (
-        <Card key={meal.id} className="overflow-hidden">
-          <CardHeader className="p-0">
-            <div className="aspect-video relative w-full bg-muted flex items-center justify-center">
-              {meal.imageUrl ? (
-                <Image src={meal.imageUrl} alt="A logged meal" fill className="object-cover" />
-              ) : (
-                <Icons.meal className="h-16 w-16 text-muted-foreground/50" />
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="p-4">
-             <div className="space-y-1">
-                <p className="font-semibold text-2xl text-primary">{Math.round(meal.calories)}</p>
-                <p className="text-sm text-muted-foreground">Calories</p>
-             </div>
-          </CardContent>
-           <CardFooter className="p-4 pt-0">
-                <p className="text-xs text-muted-foreground">
-                    Logged {meal.createdAt ? formatDistanceToNow(new Date(meal.createdAt), { addSuffix: true }) : 'just now'}
-                </p>
-          </CardFooter>
-        </Card>
-      ))}
-    </div>
+    <Card>
+      <Accordion type="single" collapsible className="w-full">
+        {Object.entries(groupedMeals).map(([date, data]) => (
+          <AccordionItem value={date} key={date}>
+            <AccordionTrigger className="px-6">
+              <div className="flex justify-between w-full pr-4">
+                <span className="font-semibold text-primary">{format(new Date(date), 'MMMM d, yyyy')}</span>
+                <span className="text-sm text-muted-foreground">
+                  Total: {Math.round(data.totalCalories)} kcal
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-4">
+              <div className="space-y-2">
+                {data.meals.map((meal) => (
+                  <div key={meal.id} className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-3">
+                      <Icons.meal className="h-5 w-5 text-muted-foreground" />
+                      <p className="font-medium">{Math.round(meal.calories)} Calories</p>
+                    </div>
+                     <p className="text-xs text-muted-foreground">
+                        {meal.createdAt ? format(new Date(meal.createdAt), 'p') : ''}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </Card>
   );
 }
