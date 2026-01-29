@@ -44,7 +44,6 @@ export type UserProfile = {
   createdAt: Timestamp | Date;
   email?: string | null;
   displayName?: string | null;
-  calorieGoals?: CalorieGoals;
 };
 
 export type EstimateMealCaloriesInput = {

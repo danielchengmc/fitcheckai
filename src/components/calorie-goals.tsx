@@ -1,15 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
 import type { CalorieGoals as CalorieGoalsType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Skeleton } from './ui/skeleton';
 import { Flame } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useUser } from '@/hooks/use-user';
 
 const GoalItem = ({ label, value, protein, color }: { label: string; value: number; protein: number; color?: string }) => (
     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50 text-center">
@@ -27,24 +24,14 @@ const GoalItem = ({ label, value, protein, color }: { label: string; value: numb
 
 
 export function CalorieGoals() {
-  const { user } = useUser();
   const { profile, loading: profileLoading } = useUserProfile();
   const [goals, setGoals] = useState<CalorieGoalsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const hasFetched = useRef(false);
 
   useEffect(() => {
     async function fetchAndSetGoals() {
-      if (profile && user) {
-        if (profile.calorieGoals) {
-          setGoals(profile.calorieGoals);
-          setLoading(false);
-          hasFetched.current = true;
-        } else {
-          if (hasFetched.current) return;
-          hasFetched.current = true;
-
+      if (profile) {
           try {
             setLoading(true);
             setError(null);
@@ -56,19 +43,12 @@ export function CalorieGoals() {
               exerciseFrequency: profile.exerciseFrequency,
             });
             setGoals(result);
-            
-            const userDocRef = doc(db, 'users', user.uid);
-            await updateDoc(userDocRef, {
-              calorieGoals: result
-            });
-
           } catch (error) {
-            console.error("Failed to fetch calorie goals", error);
-            setError("Could not load your calorie goals. You may be temporarily rate limited.");
+            console.error("Failed to calculate calorie goals", error);
+            setError("Could not load your calorie goals.");
           } finally {
             setLoading(false);
           }
-        }
       }
     }
 
@@ -77,7 +57,7 @@ export function CalorieGoals() {
     } else if (!profileLoading && !profile) {
       setLoading(false);
     }
-  }, [profile, profileLoading, user]);
+  }, [profile, profileLoading]);
 
   const isLoading = profileLoading || loading;
 
@@ -89,7 +69,7 @@ export function CalorieGoals() {
           <CardTitle>Daily Goals</CardTitle>
         </div>
         <CardDescription>
-            AI-powered recommendations for your daily calorie and protein intake.
+            Your recommended daily calorie and protein intake based on your profile.
         </CardDescription>
       </CardHeader>
       <CardContent>

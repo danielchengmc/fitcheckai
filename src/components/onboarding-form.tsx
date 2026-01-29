@@ -29,7 +29,6 @@ import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Icons } from '@/components/icons';
-import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
 
 const profileSchema = z.object({
   age: z.coerce.number().min(1, 'Please enter a valid age.'),
@@ -62,21 +61,12 @@ export function OnboardingForm() {
     setIsLoading(true);
 
     try {
-      const calorieGoals = await calculateCalorieGoals({
-        age: values.age,
-        gender: values.gender,
-        height: values.height,
-        weight: values.weight,
-        exerciseFrequency: values.exerciseFrequency,
-      });
-
       const userProfile = {
         ...values,
         email: user.email,
         displayName: user.displayName,
         profileComplete: true,
         createdAt: new Date(),
-        calorieGoals,
       };
       
       setDoc(doc(db, 'users', user.uid), userProfile, { merge: true }).catch((error) => {

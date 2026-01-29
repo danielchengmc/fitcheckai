@@ -15,7 +15,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Ready to crush your goals? Track a workout or log a meal to get started. Here are your AI-recommended calorie goals.
+            Ready to crush your goals? Track a workout or log a meal to get started. Here are your recommended daily calorie goals.
           </p>
         </CardContent>
       </Card>
