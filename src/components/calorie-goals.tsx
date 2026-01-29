@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
+import { calculateCalorieGoals } from '@/lib/calculations/calorie-goals';
 import type { CalorieGoals as CalorieGoalsType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Skeleton } from './ui/skeleton';
