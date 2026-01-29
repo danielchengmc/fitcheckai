@@ -16,7 +16,7 @@ export type Workout = {
 
 export type Meal = {
   id?: string;
-  imageUrl: string;
+  imageUrl?: string;
   calories: number;
   createdAt?: Timestamp | Date;
 };

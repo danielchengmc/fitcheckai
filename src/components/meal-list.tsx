@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card'
 import Image from 'next/image';
 import { Skeleton } from './ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
+import { Icons } from './icons';
 
 export function MealList() {
   const { user } = useUser();
@@ -70,8 +71,12 @@ export function MealList() {
       {meals.map((meal) => (
         <Card key={meal.id} className="overflow-hidden">
           <CardHeader className="p-0">
-            <div className="aspect-video relative w-full">
-              <Image src={meal.imageUrl} alt="A logged meal" fill className="object-cover" />
+            <div className="aspect-video relative w-full bg-muted flex items-center justify-center">
+              {meal.imageUrl ? (
+                <Image src={meal.imageUrl} alt="A logged meal" fill className="object-cover" />
+              ) : (
+                <Icons.meal className="h-16 w-16 text-muted-foreground/50" />
+              )}
             </div>
           </CardHeader>
           <CardContent className="p-4">
