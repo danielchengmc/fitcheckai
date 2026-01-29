@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useUser } from '@/hooks/use-user';
 import { useToast } from '@/hooks/use-toast';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useState } from 'react';
 import { Icons } from './icons';
@@ -54,7 +54,7 @@ export function WorkoutForm({ onWorkoutAdded }: WorkoutFormProps) {
     try {
       await addDoc(collection(db, 'users', user.uid, 'workouts'), {
         ...values,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
       });
 
       toast({

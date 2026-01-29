@@ -25,7 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useState } from 'react';
 import { useUser } from '@/hooks/use-user';
 import { useToast } from '@/hooks/use-toast';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Icons } from '@/components/icons';
 import { calculateCalorieGoals } from '@/ai/flows/calculate-calorie-goals';
@@ -74,7 +74,7 @@ export function OnboardingForm() {
         email: user.email,
         displayName: user.displayName,
         profileComplete: true,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
         calorieGoals,
       };
       await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
