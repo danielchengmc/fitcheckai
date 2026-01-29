@@ -18,7 +18,7 @@ import Image from 'next/image';
 import { useUser } from '@/hooks/use-user';
 import { useToast } from '@/hooks/use-toast';
 import { estimateMealCalories } from '@/ai/flows/estimate-meal-calories';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Icons } from './icons';
 import { Card, CardContent } from './ui/card';
@@ -71,7 +71,7 @@ function AiMealForm({ onMealAdded }: MealFormProps) {
 
       addDoc(collection(db, 'users', user.uid, 'meals'), {
         calories,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
       }).catch((error) => {
         console.error("Error logging meal:", error);
         toast({
@@ -154,7 +154,7 @@ function ManualMealForm({ onMealAdded }: MealFormProps) {
   
       addDoc(collection(db, 'users', user.uid, 'meals'), {
         calories: values.calories,
-        createdAt: serverTimestamp(),
+        createdAt: new Date(),
       }).catch((error) => {
         console.error("Error logging meal:", error);
         toast({
