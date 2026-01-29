@@ -21,6 +21,17 @@ export type Meal = {
   createdAt?: Timestamp | Date;
 };
 
+export type CalorieGoals = {
+  maintenance: number;
+  cutting: number;
+  bulking: number;
+  protein: {
+    cutting: number;
+    maintenance: number;
+    bulking: number;
+  };
+};
+
 export type UserProfile = {
   id?: string;
   age: number;
@@ -33,6 +44,7 @@ export type UserProfile = {
   createdAt: Timestamp | Date;
   email?: string | null;
   displayName?: string | null;
+  calorieGoals?: CalorieGoals;
 };
 
 export type EstimateMealCaloriesInput = {
@@ -51,13 +63,4 @@ export type CalculateCalorieGoalsInput = {
   exerciseFrequency: number;
 };
 
-export type CalculateCalorieGoalsOutput = {
-  maintenance: number;
-  cutting: number;
-  bulking: number;
-  protein: {
-    cutting: number;
-    maintenance: number;
-    bulking: number;
-  };
-};
+export type CalculateCalorieGoalsOutput = CalorieGoals;
