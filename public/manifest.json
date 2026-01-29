@@ -1,0 +1,21 @@
+{
+  "name": "FitTrackAI",
+  "short_name": "FitTrackAI",
+  "description": "AI-powered Fitness and Meal Tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#b488fe",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
