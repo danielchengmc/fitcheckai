@@ -39,32 +39,16 @@ export async function calculateCalorieGoals(
   } else {
     bmr = 10 * weight + 6.25 * height - 5 * age - 161;
   }
+  
+  // NOTE: The activity multiplier is no longer used for calorie goals based on the user's latest request.
+  // The exerciseFrequency is parsed but not used in the calculations below.
 
-  // 2.  Determine the activity multiplier.
-  // Sedentary (little to no exercise): BMR x 1.2
-  // Lightly Active (light exercise 1-3 days/week): BMR x 1.375
-  // Moderately Active (moderate exercise 4-5 days/week): BMR x 1.55
-  // Very Active (hard exercise 6-7 days/week): BMR x 1.725
-  let activityMultiplier: number;
-  if (exerciseFrequency === 0) {
-    activityMultiplier = 1.2;
-  } else if (exerciseFrequency >= 1 && exerciseFrequency <= 3) {
-    activityMultiplier = 1.375;
-  } else if (exerciseFrequency >= 4 && exerciseFrequency <= 5) {
-    activityMultiplier = 1.55;
-  } else { // 6-7 days
-    activityMultiplier = 1.725;
-  }
+  // 2.  Calculate the calorie goals based on BMR
+  const maintenance = Math.round(bmr);
+  const cutting = Math.round(bmr - 400);
+  const bulking = Math.round(bmr + 400);
 
-  // 3.  Calculate the Total Daily Energy Expenditure (TDEE) for maintenance
-  const tdee = bmr * activityMultiplier;
-
-  // 4.  Calculate the calorie goals
-  const maintenance = Math.round(tdee);
-  const cutting = Math.round(tdee - 400);
-  const bulking = Math.round(tdee + 400);
-
-  // 5.  Calculate the protein goals in grams
+  // 3.  Calculate the protein goals in grams
   // Protein goals is 0.8 x weight in kg x 2.2. (round to whole number)
   const proteinGoal = Math.round(0.8 * weight * 2.2);
 
