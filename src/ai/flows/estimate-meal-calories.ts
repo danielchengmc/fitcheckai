@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   name: 'estimateMealCaloriesPrompt',
   input: {schema: EstimateMealCaloriesInputSchema},
   output: {schema: EstimateMealCaloriesOutputSchema},
-  prompt: `Output only one number. Tell me the calories of everything in this picture combined.
+  prompt: `You are a calorie estimation expert. Analyze the provided image of a meal and estimate the total calorie count. Consider the ingredients, portion sizes, and relative size of the food items. Respond with ONLY a JSON object containing the estimated calories, like this: {"calories": 550}. Do not include any other text or explanation in your response.
 
   Photo: {{media url=photoDataUri}}`,
 });
