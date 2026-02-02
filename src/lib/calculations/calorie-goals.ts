@@ -1,7 +1,8 @@
-'use server';
-
 import { z } from 'zod';
-import type { CalculateCalorieGoalsInput, CalculateCalorieGoalsOutput } from '@/lib/types';
+import type {
+  CalculateCalorieGoalsInput,
+  CalculateCalorieGoalsOutput,
+} from '@/lib/types';
 
 const CalculateCalorieGoalsInputSchema = z.object({
   age: z.number().describe('The age of the user in years.'),
@@ -15,10 +16,9 @@ const CalculateCalorieGoalsInputSchema = z.object({
     .describe('How many days per week the user exercises (0-7).'),
 });
 
-
-export async function calculateCalorieGoals(
+export function calculateCalorieGoals(
   input: CalculateCalorieGoalsInput
-): Promise<CalculateCalorieGoalsOutput> {
+): CalculateCalorieGoalsOutput {
   const { age, gender, height, weight, exerciseFrequency } =
     CalculateCalorieGoalsInputSchema.parse(input);
 
@@ -40,7 +40,8 @@ export async function calculateCalorieGoals(
     activityMultiplier = 1.375; // Lightly Active
   } else if (exerciseFrequency >= 4 && exerciseFrequency <= 5) {
     activityMultiplier = 1.55; // Moderately Active
-  } else { // 6-7
+  } else {
+    // 6-7
     activityMultiplier = 1.725; // Very Active
   }
 
@@ -64,5 +65,5 @@ export async function calculateCalorieGoals(
     },
   };
 
-  return Promise.resolve(result);
+  return result;
 }
